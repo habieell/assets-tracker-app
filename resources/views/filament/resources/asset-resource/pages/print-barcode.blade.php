@@ -1,73 +1,52 @@
 <x-filament::page>
     <style>
-        * {
-            box-sizing: border-box;
-        }
-
         .barcode-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
             gap: 6px;
-            padding: 10px;
+            padding: 8px;
         }
 
         .barcode-item {
-            border: 1px solid #ccc;
-            padding: 6px;
-            font-size: 10px;
-            text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
-            height: 100px; /* Tinggi konsisten */
-            page-break-inside: avoid;
-        }
-
-        .barcode-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            margin-bottom: 4px;
-            padding: 0 4px;
-        }
-
-        .barcode-logo {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-        }
-
-        .asset-code {
-            font-size: 11px;
-            text-align: right;
-            flex: 1;
+            justify-content: center;
+            border: 1px solid #ccc;
+            padding: 6px;
+            height: 130px;
+            width: 130px;
         }
 
         .barcode-wrapper {
-            margin-top: 4px;
-            width: 100%;
+            width: 80px;
+            height: 80px;
             display: flex;
             justify-content: center;
+            align-items: center;
         }
 
-        .barcode-wrapper img {
-            max-width: 100%;
-            height: auto;
+        .asset-code {
+            font-size: 10px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+            word-break: break-word;
         }
 
         @media print {
             @page {
                 size: A4 landscape;
-                margin: 8mm;
+                margin: 6mm;
             }
 
-            html, body {
+            html,
+            body {
                 margin: 0;
                 padding: 0;
-                width: auto;
-                height: auto;
+                width: 100%;
+                background: white !important;
+                color: black !important;
                 overflow: visible !important;
             }
 
@@ -81,50 +60,52 @@
             }
 
             .barcode-grid {
-                grid-template-columns: repeat(6, 1fr);
-                gap: 6px;
-                padding: 10px;
-                margin: 0;
-                width: 100%;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(95px, 1fr));
+                gap: 2px;
+                justify-content: center;
+                align-items: center;
+                padding: 0;
             }
 
             .barcode-item {
-                height: 100px; /* Sama seperti di tampilan */
-                padding: 6px;
+                width: 95px;
+                height: 95px;
+                padding: 2px;
                 border: 1px solid #ccc;
                 display: flex;
                 flex-direction: column;
-                justify-content: flex-start;
+                justify-content: center;
                 align-items: center;
-                box-sizing: border-box;
-            }
-
-            .barcode-logo {
-                width: 30px;
-                height: 30px;
-            }
-
-            .asset-code {
-                font-size: 11px;
+                transform: scale(0.95);
+                transform-origin: top center;
             }
 
             .barcode-wrapper {
-                margin-top: 4px;
-                transform: none;
-                width: 100%;
+                width: 60px;
+                height: 60px;
                 display: flex;
                 justify-content: center;
+                align-items: center;
+                margin-bottom: 2px;
             }
 
-            .barcode-wrapper img {
-                max-width: 100%;
-                height: auto;
+            .barcode-wrapper svg {
+                width: 60px !important;
+                height: 60px !important;
+            }
+
+            .asset-code {
+                font-size: 7px;
+                text-align: center;
+                line-height: 1.1;
+                word-wrap: break-word;
             }
         }
     </style>
 
     <div class="flex justify-between items-center mb-2 print-header print:hidden">
-        <h2 class="text-xl font-bold">Cetak Barcode Aset</h2>
+        <h2 class="text-xl font-bold">Cetak QR Code Aset</h2>
         <button onclick="window.print()" class="bg-primary-600 text-white px-3 py-1 rounded text-sm">
             Print
         </button>
@@ -133,13 +114,10 @@
     <div class="barcode-grid">
         @foreach ($assets as $asset)
         <div class="barcode-item">
-            <div class="barcode-header">
-                <img src="{{ asset('images/ic-logo.png') }}" alt="Logo" class="barcode-logo" />
-                <div class="asset-code">{{ $asset->code }}</div>
-            </div>
             <div class="barcode-wrapper">
-                {!! (new Milon\Barcode\DNS1D)->getBarcodeHTML($asset->code, 'C128', 1, 40) !!}
+                {!! QrCode::size(100)->generate($asset->code) !!}
             </div>
+            <div class="asset-code">{{ $asset->code }}</div>
         </div>
         @endforeach
     </div>

@@ -12,13 +12,20 @@ class Asset extends Model
     protected $fillable = [
         'code',
         'name',
+        'division_owner',
+        'category',
+        'asset_number',
+        'penanggung_jawab',
         'location',
         'status',
         'input_date',
-        'barcode_url',
-        'user_id',
         'purchase_date',
         'used_date',
+        'purchase_price',
+        'purchase_source',
+        'invoice_number',
+        'asset_image',
+        'invoice_image',
         'description',
     ];
 
@@ -27,14 +34,4 @@ class Asset extends Model
         'purchase_date' => 'date',
         'used_date' => 'date',
     ];
-
-    public function logs()
-    {
-        return $this->hasMany(AssetLog::class);
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 }

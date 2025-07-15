@@ -13,7 +13,7 @@ use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use Filament\Widgets;
 use App\Filament\Widgets\AssetCreatedChart;
-use App\Filament\Widgets\AssetStatusChart;
+use App\Filament\Widgets\AssetCategoryChart;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -44,7 +44,15 @@ class AdminPanelProvider extends PanelProvider
                 Widgets\FilamentInfoWidget::class,
                 AssetOverview::class,
                 AssetCreatedChart::class,
-                AssetStatusChart::class,
+                AssetCategoryChart::class,
+            ])
+            ->navigationItems([
+                \Filament\Navigation\NavigationItem::make()
+                    ->label('Print Semua Barcode')
+                    ->icon('heroicon-o-printer')
+                    ->group('Cetak')
+                    ->url(fn () => route('filament.admin.resources.assets.print-barcode'))
+                    ->sort(1),
             ])
             ->middleware([
                 EncryptCookies::class,

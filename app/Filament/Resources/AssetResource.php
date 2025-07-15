@@ -4,14 +4,14 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\AssetResource\Pages;
 use App\Models\Asset;
-use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Tables\Actions\Action;
-use Milon\Barcode\DNS1D;
+use Filament\Tables\Filters\SelectFilter;
+use Carbon\Carbon;
 
 class AssetResource extends Resource
 {
@@ -27,16 +27,41 @@ class AssetResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('code')
                 ->label('Kode Aset')
-                ->required()
-                ->unique(ignoreRecord: true),
+                ->readOnly(),
 
             Forms\Components\TextInput::make('name')
                 ->label('Nama Aset')
                 ->required(),
 
-            Forms\Components\TextInput::make('location')
-                ->label('Lokasi')
-                ->required(),
+            Forms\Components\Select::make('division_owner')
+                ->label('Divisi (Data Owner)')
+                ->options([
+                    'IT' => 'IT - Perangkat Kerja',
+                    'GA' => 'GA - Furniture',
+                ])
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(fn($state, callable $set, callable $get) => static::generateCode($set, $get)),
+
+            Forms\Components\Select::make('category')
+                ->label('Kategori')
+                ->options([
+                    'MOBIL' => 'Mobil',
+                    'LAPTOP' => 'Laptop',
+                    'PRINTER' => 'Printer',
+                    'AC' => 'AC',
+                    'FURNITURE' => 'Furniture',
+                    'TV' => 'TV',
+                    'CCTV' => 'CCTV',
+                    'HANDPHONE' => 'Handphone'
+                ])
+                ->required()
+                ->reactive()
+                ->afterStateUpdated(fn($state, callable $set, callable $get) => static::generateCode($set, $get)),
+
+            Forms\Components\Hidden::make('asset_number'),
+
+            Forms\Components\TextInput::make('location')->label('Lokasi')->required(),
 
             Forms\Components\Select::make('status')
                 ->label('Status')
@@ -48,20 +73,13 @@ class AssetResource extends Resource
                 ->required()
                 ->default('aktif'),
 
-            Forms\Components\DatePicker::make('input_date')
-                ->label('Tanggal Masuk'),
+            Forms\Components\DatePicker::make('input_date')->label('Tanggal Masuk')->default(today()),
 
-            Forms\Components\Select::make('user_id')
-                ->label('Penanggung Jawab')
-                ->relationship('user', 'name')
-                ->searchable()
-                ->required(),
+            Forms\Components\TextInput::make('penanggung_jawab')->label('Penanggung Jawab')->required(),
 
-            Forms\Components\DatePicker::make('purchase_date')
-                ->label('Tanggal Pembelian'),
+            Forms\Components\DatePicker::make('purchase_date')->label('Tanggal Pembelian'),
 
-            Forms\Components\DatePicker::make('used_date')
-                ->label('Tanggal Digunakan'),
+            Forms\Components\DatePicker::make('used_date')->label('Tanggal Digunakan'),
 
             Forms\Components\TextInput::make('purchase_price')
                 ->label('Harga Pembelian')
@@ -69,11 +87,23 @@ class AssetResource extends Resource
                 ->numeric()
                 ->inputMode('decimal'),
 
-            Forms\Components\TextInput::make('purchase_source')
-                ->label('Sumber Pembelian'),
+            Forms\Components\TextInput::make('purchase_source')->label('Sumber Pembelian'),
 
-            Forms\Components\TextInput::make('invoice_number')
-                ->label('Nomor Invoice'),
+            Forms\Components\TextInput::make('invoice_number')->label('Nomor Invoice'),
+
+            Forms\Components\FileUpload::make('asset_image')
+                ->label('Foto Aset')
+                ->directory('uploads/assets')
+                ->image()
+                ->maxSize(2048),
+
+            Forms\Components\FileUpload::make('invoice_image')
+                ->label('Foto Invoice')
+                ->directory('uploads/invoices')
+                ->image()
+                ->maxSize(2048),
+
+            Forms\Components\Textarea::make('description')->label('Deskripsi')->columnSpanFull(),
         ]);
     }
 
@@ -81,51 +111,38 @@ class AssetResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('code')
-                    ->label('Kode')
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('name')
-                    ->label('Nama Aset')
-                    ->searchable(),
-
-                Tables\Columns\TextColumn::make('location')
-                    ->label('Lokasi'),
-
-                Tables\Columns\TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
+                Tables\Columns\TextColumn::make('code')->label('Kode')->wrap()->searchable(),
+                Tables\Columns\TextColumn::make('division_owner')->label('Data Owner'),
+                Tables\Columns\TextColumn::make('category')->label('Kategori'),
+                Tables\Columns\TextColumn::make('name')->label('Nama Aset')->searchable(),
+                Tables\Columns\TextColumn::make('location')->label('Lokasi'),
+                Tables\Columns\TextColumn::make('purchase_source')->label('Sumber Pembelian'),
+                Tables\Columns\TextColumn::make('status')->label('Status')->badge()
                     ->colors([
                         'success' => 'aktif',
                         'warning' => 'dipindah',
                         'danger' => 'rusak',
-                    ])
-                    ->formatStateUsing(fn($state) => ucfirst($state)),
-
-                Tables\Columns\TextColumn::make('input_date')
-                    ->label('Tanggal Masuk')
-                    ->date('d M Y'),
-
-                Tables\Columns\TextColumn::make('user.name')
-                    ->label('Penanggung Jawab'),
-
-                Tables\Columns\TextColumn::make('purchase_date')
-                    ->label('Tanggal Pembelian')
-                    ->date(),
-
-                Tables\Columns\TextColumn::make('used_date')
-                    ->label('Tanggal Digunakan')
-                    ->date(),
-
+                    ]),
+                Tables\Columns\TextColumn::make('penanggung_jawab')->label('Penanggung Jawab'),
                 Tables\Columns\TextColumn::make('purchase_price')
                     ->label('Harga')
-                    ->formatStateUsing(fn($state) => 'Rp ' . number_format((float)$state, 2, ',', '.')),
-
-                Tables\Columns\TextColumn::make('purchase_source')
-                    ->label('Sumber Pembelian'),
-
-                Tables\Columns\TextColumn::make('invoice_number')
-                    ->label('Nomor Invoice'),
+                    ->formatStateUsing(fn($state) => $state ? 'Rp ' . number_format((float)$state, 0, ',', '.') : '-'),
+                Tables\Columns\ImageColumn::make('asset_image')->label('Foto Aset')->square(),
+                Tables\Columns\ImageColumn::make('invoice_image')->label('Invoice')->square(),
+            ])
+            ->filters([
+                SelectFilter::make('category')
+                    ->label('Kategori')
+                    ->options([
+                        'MOBIL' => 'Mobil',
+                        'LAPTOP' => 'Laptop',
+                        'PRINTER' => 'Printer',
+                        'AC' => 'AC',
+                        'FURNITURE' => 'Furniture',
+                        'TV' => 'TV',
+                        'CCTV' => 'CCTV',
+                        'HANDPHONE' => 'Handphone'
+                    ])
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -140,18 +157,33 @@ class AssetResource extends Resource
             ]);
     }
 
-    public static function getRelations(): array
-    {
-        return [];
-    }
-
     public static function getPages(): array
     {
         return [
             'index' => Pages\ListAssets::route('/'),
             'create' => Pages\CreateAsset::route('/create'),
             'edit' => Pages\EditAsset::route('/{record}/edit'),
-            'print-barcode' => Pages\PrintBarcode::route('/print-barcode/{record?}'),
+            'print-barcode' => Pages\PrintBarcode::route('/print-barcode'),
         ];
+    }
+
+    protected static function generateCode(callable $set, callable $get): void
+    {
+        $division = $get('division_owner') ?? '';
+        $category = $get('category') ?? '';
+        $assetNumber = $get('asset_number');
+
+        if (!$assetNumber) {
+            $assetNumber = str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            $set('asset_number', $assetNumber);
+        }
+
+        $month = Carbon::now()->format('m');
+        $year = Carbon::now()->format('Y');
+
+        if ($division && $category && $assetNumber) {
+            $code = "ICG/{$division}/{$category}/{$assetNumber}/{$month}-{$year}";
+            $set('code', $code);
+        }
     }
 }

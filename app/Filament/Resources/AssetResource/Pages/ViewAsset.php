@@ -6,7 +6,7 @@ use App\Filament\Resources\AssetResource;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Infolists\Infolist;
 use Filament\Infolists\Components\TextEntry;
-use Milon\Barcode\DNS1D;
+use Milon\Barcode\DNS2D;
 
 class ViewAsset extends ViewRecord
 {
@@ -39,9 +39,9 @@ class ViewAsset extends ViewRecord
                         ->date(),
 
                     TextEntry::make('barcode')
-                        ->label('Barcode')
+                        ->label('QR Code')
                         ->html()
-                        ->getStateUsing(fn ($record) => (new DNS1D)->getBarcodeHTML($record->code, 'C128')),
+                        ->getStateUsing(fn ($record) => (new DNS2D)->getBarcodeHTML($record->code, 'QRCODE', 5, 5)),
                 ]),
         ];
     }

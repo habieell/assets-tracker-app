@@ -10,15 +10,14 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Buat user admin
-        $admin = User::factory()->create([
+        // (Opsional) Buat user admin jika memang masih digunakan untuk login Filament
+        User::factory()->create([
             'name' => 'Admin ICG',
             'email' => 'admin@indoconsult.com',
             'password' => bcrypt('pass123'),
         ]);
 
-        Asset::factory()->count(100)->create([
-            'user_id' => $admin->id,
-        ]);
+        // Generate 100 data asset tanpa user_id
+        Asset::factory()->count(50)->create();
     }
 }

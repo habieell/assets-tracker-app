@@ -27,18 +27,8 @@ class AssetCreatedChart extends ChartWidget
                 ],
             ],
             'labels' => [
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'Mei',
-                'Jun',
-                'Jul',
-                'Agu',
-                'Sep',
-                'Okt',
-                'Nov',
-                'Des'
+                'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+                'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des',
             ],
         ];
     }
@@ -52,7 +42,7 @@ class AssetCreatedChart extends ChartWidget
     {
         return [
             'md' => 12,
-            'xl' => '1/2',
+            'xl' => '1/2', // <-- tampil 1/2 lebar di layar besar
         ];
     }
 }

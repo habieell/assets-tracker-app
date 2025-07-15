@@ -10,18 +10,23 @@ return new class extends Migration
     {
         Schema::create('assets', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
-            $table->string('name');
-            $table->string('location');
+            $table->string('code')->unique(); // Kode aset (ICG/...)
+            $table->string('name'); // Nama aset
+            $table->string('division_owner')->nullable(); // Divisi (Data Owner)
+            $table->string('category'); // Kategori aset
+            $table->string('asset_number'); // Nomor aset
+            $table->string('penanggung_jawab')->nullable(); // Pemegang aset
+            $table->string('location'); // Lokasi
             $table->enum('status', ['aktif', 'rusak', 'dipindah'])->default('aktif');
-            $table->date('input_date')->nullable();
-            $table->unsignedBigInteger('user_id')->nullable(); // Penanggung Jawab
-            $table->date('purchase_date')->nullable(); // Tanggal Pembelian
-            $table->date('used_date')->nullable(); // Tanggal Digunakan
-            $table->decimal('purchase_price', 15, 2)->nullable(); // Harga Pembelian
-            $table->string('purchase_source')->nullable(); // Sumber Pembelian
-            $table->string('invoice_number')->nullable(); // Nomor Invoice
-            $table->text('description')->nullable(); // Deskripsi Aset
+            $table->date('input_date')->nullable(); // Tanggal masuk
+            $table->date('purchase_date')->nullable(); // Tanggal pembelian
+            $table->date('used_date')->nullable(); // Tanggal digunakan
+            $table->decimal('purchase_price', 15, 2)->nullable(); // Harga pembelian
+            $table->string('purchase_source')->nullable(); // Sumber pembelian
+            $table->string('invoice_number')->nullable(); // Nomor invoice
+            $table->string('asset_image')->nullable(); // Foto aset
+            $table->string('invoice_image')->nullable(); // Foto invoice
+            $table->text('description')->nullable(); // Deskripsi
             $table->timestamps();
         });
     }
