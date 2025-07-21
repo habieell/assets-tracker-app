@@ -21,6 +21,7 @@ class Asset extends Model
         'input_date',
         'purchase_date',
         'used_date',
+        'end_of_life', // ✅ Tambahan
         'purchase_price',
         'purchase_source',
         'invoice_number',
@@ -33,6 +34,19 @@ class Asset extends Model
         'input_date' => 'date',
         'purchase_date' => 'date',
         'used_date' => 'date',
-        'asset_images' => 'array', 
+        'end_of_life' => 'date', // ✅ Tambahan
+        'asset_images' => 'array', // ✅ Karena multiple upload (JSON)
     ];
+
+    /**
+     * Hook untuk update status otomatis
+     */
+    protected static function booted()
+    {
+        static::saving(function ($asset) {
+            if ($asset->end_of_life && now()->greaterThan($asset->end_of_life)) {
+                $asset->status = 'inventaris';
+            }
+        });
+    }
 }

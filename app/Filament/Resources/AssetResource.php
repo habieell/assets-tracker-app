@@ -27,6 +27,7 @@ class AssetResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('code')
                 ->label('Kode Aset')
+                ->readOnly() // ✅ Tidak diketik manual, otomatis generate
                 ->required(),
 
             Forms\Components\TextInput::make('name')
@@ -61,7 +62,7 @@ class AssetResource extends Resource
 
             Forms\Components\Hidden::make('asset_number'),
 
-            Forms\Components\TextInput::make('location')->label('Lokasi')->required(),
+            Forms\Components\TextInput::make('location')->label('Lokasi'),
 
             Forms\Components\Select::make('status')
                 ->label('Status')
@@ -69,17 +70,28 @@ class AssetResource extends Resource
                     'aktif' => 'Aktif',
                     'rusak' => 'Rusak',
                     'dipindah' => 'Dipindah',
+                    'inventaris' => 'Inventaris',
                 ])
                 ->required()
                 ->default('aktif'),
 
-            Forms\Components\DatePicker::make('input_date')->label('Tanggal Masuk')->default(today()),
+            Forms\Components\DatePicker::make('input_date')
+                ->label('Tanggal Masuk')
+                ->default(today()),
 
-            Forms\Components\TextInput::make('penanggung_jawab')->label('Penanggung Jawab')->required(),
+            Forms\Components\DatePicker::make('end_of_life')
+                ->label('Masa Akhir Manfaat'),
 
-            Forms\Components\DatePicker::make('purchase_date')->label('Tanggal Pembelian'),
 
-            Forms\Components\DatePicker::make('used_date')->label('Tanggal Digunakan'),
+            Forms\Components\DatePicker::make('purchase_date')
+                ->label('Tanggal Pembelian'),
+
+            Forms\Components\DatePicker::make('used_date')
+                ->label('Tanggal Digunakan'),
+
+            Forms\Components\TextInput::make('penanggung_jawab')
+                ->label('Penanggung Jawab')
+                ->required(),
 
             Forms\Components\TextInput::make('purchase_price')
                 ->label('Harga Pembelian')
@@ -87,11 +99,13 @@ class AssetResource extends Resource
                 ->numeric()
                 ->inputMode('decimal'),
 
-            Forms\Components\TextInput::make('purchase_source')->label('Sumber Pembelian'),
+            Forms\Components\TextInput::make('purchase_source')
+                ->label('Sumber Pembelian'),
 
-            Forms\Components\TextInput::make('invoice_number')->label('Nomor Invoice'),
+            Forms\Components\TextInput::make('invoice_number')
+                ->label('Nomor Invoice'),
 
-            // Multiple Foto Aset (kolom: asset_images)
+            // ✅ Multiple Foto Aset
             Forms\Components\FileUpload::make('asset_images')
                 ->label('Foto Aset')
                 ->directory('uploads/assets')
@@ -108,7 +122,8 @@ class AssetResource extends Resource
                 ->image()
                 ->maxSize(2048),
 
-            Forms\Components\Textarea::make('description')->label('Deskripsi')->columnSpanFull(),
+            Forms\Components\Textarea::make('description')
+                ->label('Deskripsi')->columnSpanFull(),
         ]);
     }
 
@@ -127,13 +142,15 @@ class AssetResource extends Resource
                         'success' => 'aktif',
                         'warning' => 'dipindah',
                         'danger' => 'rusak',
+                        'info' => 'inventaris',
                     ]),
+                Tables\Columns\TextColumn::make('end_of_life')->label('Masa Akhir Manfaat')->date(),
                 Tables\Columns\TextColumn::make('penanggung_jawab')->label('Penanggung Jawab'),
                 Tables\Columns\TextColumn::make('purchase_price')
                     ->label('Harga')
                     ->formatStateUsing(fn($state) => $state ? 'Rp ' . number_format((float)$state, 0, ',', '.') : '-'),
 
-                // Custom view untuk multiple images
+                // ✅ Custom View untuk Multiple Image
                 Tables\Columns\ViewColumn::make('asset_images')
                     ->label('Foto Aset')
                     ->view('tables.columns.asset-images'),

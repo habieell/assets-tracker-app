@@ -24,6 +24,20 @@
             <li><code>ICG/GA/FURNITURE/0102/07-2025</code> → Meja kantor milik divisi GA</li>
         </ul>
 
+        <h2>Status Aset</h2>
+        <ul>
+            <li><strong>Aktif</strong> → Aset sedang digunakan</li>
+            <li><strong>Rusak</strong> → Aset perlu diperbaiki</li>
+            <li><strong>Dipindah</strong> → Aset dipindahkan ke lokasi lain</li>
+            <li><strong>Inventaris</strong> → Aset sudah melewati masa manfaat (<code>end_of_life</code>)</li>
+        </ul>
+
+        <h2>Masa Akhir Manfaat</h2>
+        <p>
+            Setiap aset memiliki tanggal <strong>Masa Akhir Manfaat</strong> yang harus diisi saat registrasi. 
+            Jika tanggal saat ini melewati <code>end_of_life</code>, maka sistem akan otomatis mengubah status aset menjadi <strong>Inventaris</strong>.
+        </p>
+
         <h2>Kode Kategori Aset</h2>
         <table>
             <thead>
