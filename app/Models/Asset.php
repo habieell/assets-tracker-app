@@ -24,7 +24,7 @@ class Asset extends Model
         'purchase_price',
         'purchase_source',
         'invoice_number',
-        'asset_image',
+        'asset_images',
         'invoice_image',
         'description',
     ];
@@ -33,5 +33,6 @@ class Asset extends Model
         'input_date' => 'date',
         'purchase_date' => 'date',
         'used_date' => 'date',
+        'asset_images' => 'array', 
     ];
 }

@@ -16,12 +16,13 @@ class ListAssets extends ListRecords
     {
         return [
             Actions\Action::make('print-filter')
-                ->label('Print Sesuai Filter')
+                ->label('Print Barcode')
                 ->icon('heroicon-o-printer')
                 ->color('warning')
-                ->url(function () {
-                    $filters = request()->query('tableFilters');
-                    return route('filament.admin.resources.assets.print-barcode') . ($filters ? '?' . http_build_query(['tableFilters' => $filters]) : '');
+                ->action(function ($livewire) {
+                    $filters = $livewire->tableFilters; 
+                    $url = route('filament.admin.resources.assets.print-barcode') . '?' . http_build_query(['tableFilters' => $filters]);
+                    return redirect()->to($url);
                 }),
 
             Actions\CreateAction::make()->label('New Aset'),

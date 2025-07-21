@@ -15,22 +15,32 @@ class PrintBarcode extends Page
 
     public function mount(): void
     {
+        $query = Asset::query();
+
         if (request()->has('record')) {
-            $this->assets = Asset::where('id', request('record'))->get();
-        } elseif (request()->has('selected')) {
+            // ✅ Print single asset
+            $this->assets = $query->where('id', request('record'))->get();
+            return;
+        }
+
+        if (request()->has('selected')) {
+            // ✅ Print selected assets
             $ids = explode(',', request('selected'));
-            $this->assets = Asset::whereIn('id', $ids)->get();
-        } elseif (request()->has('tableFilters')) {
+            $this->assets = $query->whereIn('id', $ids)->get();
+            return;
+        }
+
+        if (request()->has('tableFilters')) {
+            // ✅ Print with filters from query
             $filters = request()->query('tableFilters');
-            $query = Asset::query();
 
             if (!empty($filters['category']['value'])) {
                 $query->where('category', $filters['category']['value']);
             }
 
-            $this->assets = $query->get();
-        } else {
-            $this->assets = Asset::all();
+            // ✅ Bisa tambahkan filter lain jika ada
         }
+
+        $this->assets = $query->get();
     }
 }

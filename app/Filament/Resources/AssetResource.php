@@ -27,7 +27,7 @@ class AssetResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('code')
                 ->label('Kode Aset')
-                ->readOnly(),
+                ->required(),
 
             Forms\Components\TextInput::make('name')
                 ->label('Nama Aset')
@@ -91,11 +91,16 @@ class AssetResource extends Resource
 
             Forms\Components\TextInput::make('invoice_number')->label('Nomor Invoice'),
 
-            Forms\Components\FileUpload::make('asset_image')
+            // Multiple Foto Aset (kolom: asset_images)
+            Forms\Components\FileUpload::make('asset_images')
                 ->label('Foto Aset')
                 ->directory('uploads/assets')
+                ->multiple()
+                ->reorderable()
                 ->image()
-                ->maxSize(2048),
+                ->maxFiles(10)
+                ->maxSize(2048)
+                ->columnSpanFull(),
 
             Forms\Components\FileUpload::make('invoice_image')
                 ->label('Foto Invoice')
@@ -127,7 +132,12 @@ class AssetResource extends Resource
                 Tables\Columns\TextColumn::make('purchase_price')
                     ->label('Harga')
                     ->formatStateUsing(fn($state) => $state ? 'Rp ' . number_format((float)$state, 0, ',', '.') : '-'),
-                Tables\Columns\ImageColumn::make('asset_image')->label('Foto Aset')->square(),
+
+                // Custom view untuk multiple images
+                Tables\Columns\ViewColumn::make('asset_images')
+                    ->label('Foto Aset')
+                    ->view('tables.columns.asset-images'),
+
                 Tables\Columns\ImageColumn::make('invoice_image')->label('Invoice')->square(),
             ])
             ->filters([

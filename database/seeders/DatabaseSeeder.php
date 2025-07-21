@@ -18,6 +18,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Generate 100 data asset tanpa user_id
-        Asset::factory()->count(50)->create();
+        // Asset::factory()->count(50)->create();
     }
 }

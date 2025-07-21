@@ -30,6 +30,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
+            ->brandLogo(asset('ic-logo.png')) // Logo
+            ->brandLogoHeight('50px') // ✅ Atur tinggi logo (default kecil, kita besarkan)
+            ->brandName('Arraya Asset Manager') // ✅ Teks di samping logo
+            ->favicon(asset('ic-logo.png')) // Favicon opsional
             ->colors([
                 'primary' => Color::Amber,
             ])
@@ -40,19 +44,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
                 AssetOverview::class,
                 AssetCreatedChart::class,
                 AssetCategoryChart::class,
-            ])
-            ->navigationItems([
-                \Filament\Navigation\NavigationItem::make()
-                    ->label('Print Semua Barcode')
-                    ->icon('heroicon-o-printer')
-                    ->group('Cetak')
-                    ->url(fn () => route('filament.admin.resources.assets.print-barcode'))
-                    ->sort(1),
             ])
             ->middleware([
                 EncryptCookies::class,
