@@ -90,8 +90,7 @@ class AssetResource extends Resource
                 ->label('Tanggal Digunakan'),
 
             Forms\Components\TextInput::make('penanggung_jawab')
-                ->label('Penanggung Jawab')
-                ->required(),
+                ->label('Penanggung Jawab'),
 
             Forms\Components\TextInput::make('purchase_price')
                 ->label('Harga Pembelian')
