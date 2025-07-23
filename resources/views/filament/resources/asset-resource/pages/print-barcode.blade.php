@@ -104,21 +104,38 @@
         }
     </style>
 
+    <!-- Header Action -->
     <div class="flex justify-between items-center mb-2 print-header print:hidden">
-        <h2 class="text-xl font-bold">Cetak QR Code Aset</h2>
-        <button onclick="window.print()" class="bg-primary-600 text-white px-3 py-1 rounded text-sm">
-            Print
-        </button>
+        <h2 class="text-xl font-bold">Cetak & Download Barcode Aset</h2>
+        <div class="flex gap-2">
+            <!-- ✅ Tombol Download PDF -->
+            <x-filament::button 
+                tag="a" 
+                href="{{ route('barcode.download.pdf', request()->query()) }}" 
+                color="primary" 
+                icon="heroicon-o-arrow-down-tray">
+                Download PDF
+            </x-filament::button>
+
+            <!-- ✅ Tombol Print -->
+            <x-filament::button 
+                color="warning" 
+                icon="heroicon-o-printer" 
+                onclick="window.print()">
+                Print
+            </x-filament::button>
+        </div>
     </div>
 
+    <!-- Grid Barcode -->
     <div class="barcode-grid">
         @foreach ($assets as $asset)
-        <div class="barcode-item">
-            <div class="barcode-wrapper">
-                {!! QrCode::size(100)->generate($asset->code) !!}
+            <div class="barcode-item">
+                <div class="barcode-wrapper">
+                    {!! QrCode::size(100)->generate($asset->code) !!}
+                </div>
+                <div class="asset-code">{{ $asset->code }}</div>
             </div>
-            <div class="asset-code">{{ $asset->code }}</div>
-        </div>
         @endforeach
     </div>
 </x-filament::page>

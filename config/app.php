@@ -101,6 +101,7 @@ return [
          * Package Service Providers...
          */
         SimpleSoftwareIO\QrCode\QrCodeServiceProvider::class, // ✅ Tambahkan ini
+        Barryvdh\DomPDF\ServiceProvider::class, // ✅ Tambahkan ini untuk PDF
 
         /*
          * Application Service Providers...
@@ -153,8 +154,9 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
-        // ✅ Tambahkan ini agar QrCode dikenali
-        'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class,
+        // ✅ Alias Tambahan
+        'QrCode' => SimpleSoftwareIO\QrCode\Facades\QrCode::class, // Untuk QR Code
+        'PDF' => Barryvdh\DomPDF\Facade\Pdf::class, // Untuk PDF
     ],
 
 ];

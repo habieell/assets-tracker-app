@@ -27,7 +27,7 @@ class AssetResource extends Resource
         return $form->schema([
             Forms\Components\TextInput::make('code')
                 ->label('Kode Aset')
-                ->readOnly() // ✅ Tidak diketik manual, otomatis generate
+                ->readOnly() // Tidak diketik manual, otomatis generate
                 ->required(),
 
             Forms\Components\TextInput::make('name')
@@ -104,7 +104,7 @@ class AssetResource extends Resource
             Forms\Components\TextInput::make('invoice_number')
                 ->label('Nomor Invoice'),
 
-            // ✅ Multiple Foto Aset
+            // Multiple Foto Aset
             Forms\Components\FileUpload::make('asset_images')
                 ->label('Foto Aset')
                 ->directory('uploads/assets')
@@ -149,7 +149,7 @@ class AssetResource extends Resource
                     ->label('Harga')
                     ->formatStateUsing(fn($state) => $state ? 'Rp ' . number_format((float)$state, 0, ',', '.') : '-'),
 
-                // ✅ Custom View untuk Multiple Image
+                // Custom View untuk Multiple Image
                 Tables\Columns\ViewColumn::make('asset_images')
                     ->label('Foto Aset')
                     ->view('tables.columns.asset-images'),
@@ -167,7 +167,7 @@ class AssetResource extends Resource
                         'FURNITURE' => 'Furniture',
                         'TV' => 'TV',
                         'CCTV' => 'CCTV',
-                        'HANDPHONE' => 'Handphone'
+                        'HANDPHONE' => 'Handphone',
                     ])
             ])
             ->actions([
